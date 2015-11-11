@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Implementation-Title: tingyun-agent
+Implementation-Version: 1.0.6
+Built-By: root
+Created-By: Apache Maven 3.2.3
+Premain-Class: monitor.agent.Agent
+Agent-Class: monitor.agent.Agent
+Implementation-Vendor-Id: com.tingyun
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
+Main-Class: monitor.agent.Agent
+Archiver-Version: Plexus Archiver
+Agent-Version: 1.0.6
+Build-Jdk: 1.7.0_45
+Built-At: 2015-01-07 08:23
+
