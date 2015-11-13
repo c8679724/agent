@@ -6,8 +6,9 @@ public class MonitorFilter {
 
 		new Test1().test();
 
-		monitor.util.jvm.VirtualMachine.loadAgent("H:/workspace/agent/target/agent-0.0.1-SNAPSHOT.jar");
+//		monitor.util.jvm.VirtualMachine.loadAgent("H:/workspace/agent/target/agent-0.0.1-SNAPSHOT.jar");
 
+		new Test1().test();
 		new Test1().test();
 
 		Throwable t = new Throwable("Test");

@@ -41,14 +41,19 @@ public class Agent {
 		Properties.doProperties(propertiesFilePath);
 
 		Class[] classes = inst.getAllLoadedClasses();
+//		for (Class class1 : classes) {
+//			System.out.println("------"+class1.getName());
+//		}
 		Class[] classes2 = ClassesChoose.chooseClasses(classes);
 
 		inst.addTransformer(new Transformer(), true);
 		// inst.addTransformer(new TransformerThrowable(), true);
-		try {
-			inst.retransformClasses(classes2);
-		} catch (UnmodifiableClassException e) {
-			e.printStackTrace();
+		if (classes2.length > 0) {
+			try {
+				inst.retransformClasses(classes2);
+			} catch (UnmodifiableClassException e) {
+				e.printStackTrace();
+			}
 		}
 
 		// try {

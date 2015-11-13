@@ -6,16 +6,28 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.ClassNode;
+
+import monitor.agent.Transformer;
+
 public class ClassesChoose {
 
+	/**
+	 * 用户想要被添加切面的类的正则表达式
+	 */
 	private static Pattern[] patterns;
 
-	private static Pattern[] jdkPatterns;
-	
 	/**
-	 * 反向正则
+	 * jdk里面的类
 	 */
-	static Pattern[] exPatterns;
+	private static Pattern[] jdkPatterns;
+
+	/**
+	 * 反向规则正则表达式
+	 */
+	private static Pattern[] exPatterns;
 
 	/**
 	 * 
@@ -64,7 +76,79 @@ public class ClassesChoose {
 	 * @param clazz
 	 * @return
 	 */
+	public static boolean needTransformer(byte[] classfileBuffer) {
+
+		ClassReader classReader = new ClassReader(classfileBuffer);
+		ClassNode cn = new ClassNode();
+		classReader.accept(cn, 0);
+		String className = cn.name;
+
+		// 判断是否已经转换过了
+		boolean isTransform = false;
+		isTransform = Transformer.isTransform(className.replaceAll(".", "/"));
+		if (isTransform) {
+			return false;
+		}
+
+		String clazzPath = className + ".";
+		String methodPath = "";
+
+		List<org.objectweb.asm.tree.MethodNode> methods = cn.methods;
+		for (int i = 0; i < methods.size(); i++) {
+
+			try {
+				org.objectweb.asm.tree.MethodNode method = methods.get(i);
+				String methodName = method.name;
+				if (methodName.equals("<init>") || "<clinit>".equals(methodName)) {
+					continue;
+				}
+
+				Type[] paramTypes = Type.getArgumentTypes(method.desc);
+				String argsType = "";
+				if (paramTypes != null) {
+					for (int j = 0; j < paramTypes.length; j++) {
+						argsType += paramTypes[j].getClassName();
+					}
+				}
+				methodPath = clazzPath + methodName + "(" + argsType + ")";
+				methodPath = methodPath.replaceAll("/", ".");
+				// 监控内置的规则
+
+				// 找到用户想要被监控的类和方法
+				boolean mr = true;
+				Matcher matcher = null;
+				for (int j = 0; j < patterns.length; j++) {
+					matcher = patterns[j].matcher(methodPath);
+					mr = matcher.matches();
+					if (mr) {
+						return true;
+					}
+				}
+
+				// 找到用户的aop切面，过滤不加aop
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+		return false;
+	}
+
+	/**
+	 * 匹配class里面的每一个方法是否有符合规则的，只要有一个的话就需要做转换(返回true)
+	 * 
+	 * @param clazz
+	 * @return
+	 */
 	public static boolean needTransformer(Class<?> clazz) {
+
+		// 判断是否已经转换过了
+		boolean isTransform = false;
+		isTransform = Transformer.isTransform(clazz.getPackage() + "." + clazz.getSimpleName());
+		if (isTransform) {
+			return false;
+		}
 
 		String clazzPath = clazz.getPackage().getName() + "." + clazz.getSimpleName() + ".";
 		Method[] methods = clazz.getMethods();

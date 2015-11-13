@@ -1,6 +1,5 @@
 package monitor.agent;
 
-import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
@@ -17,59 +16,50 @@ import monitor.aop.asmUtil.CustomClassVisitor;
 
 public class Transformer implements ClassFileTransformer {
 
-	final static List<Class<?>> transform_after_Classese = new ArrayList<Class<?>>();
-
-	public static boolean isTransform(Class<?> clazz) {
-		for (Class<?> clazz1 : transform_after_Classese) {
-			if (clazz1.equals(clazz)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static void addTransform_after_Classese(Class<?> clazz) {
-		transform_after_Classese.add(clazz);
-	}
+	final static List<String> transform_after_Classese = new ArrayList<String>();
 
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
 
 		boolean c = false;
-		boolean isTransform = false;
-		Class<?> clazz = null;
-		try {
-			clazz = Class.forName(className.replace('/', '.'));
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-		}
+		c = ClassesChoose.needTransformer(classfileBuffer);
 
-		// 判断是否已经转换过了
-		isTransform = Transformer.isTransform(clazz);
-		if (isTransform) {
-			return classfileBuffer;
-		}
-
-		Transformer.addTransform_after_Classese(clazz);
-		c = ClassesChoose.needTransformer(clazz);
 		if (c) {
 			// 设置正在处理的类的包名、类名到当前线程中，以便硬编码这些信息到切面中
-			Application.setClass(clazz);
+			Application.setClass(className);
 
-			// 开始转换类的字节码
-			ClassReader classReader = null;
 			try {
-				classReader = new ClassReader(className);
+				ClassReader classReader = null;
+				classReader = new ClassReader(classfileBuffer);
+
+				// 开始转换类的字节码
 				ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 				CustomClassVisitor customClassVisitor = new CustomClassVisitor(Opcodes.ASM5, classWriter);
 				classReader.accept(customClassVisitor, 0);
-				return classWriter.toByteArray();
-			} catch (IOException e) {
+				byte[] classfileBuffer_ = classWriter.toByteArray();
+
+				// 记录已经转换过的类，避免重复转换
+				Transformer.addTransform_after_Classese(className);
+				return classfileBuffer_;
+			} catch (Exception e) {
 				e.printStackTrace();
 				return classfileBuffer;
 			}
 		} else {
 			return classfileBuffer;
 		}
+	}
+
+	public static boolean isTransform(String className) {
+		for (String clazz1 : transform_after_Classese) {
+			if (clazz1.equals(className)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void addTransform_after_Classese(String className) {
+		transform_after_Classese.add(className);
 	}
 }

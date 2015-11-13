@@ -5,8 +5,7 @@ import java.util.List;
 
 import org.objectweb.asm.Type;
 
-import com.google.gson.Gson;
-
+import agent.com.google.gson.Gson;
 import monitor.Application;
 import monitor.support.MethodAnalyze;
 
@@ -59,9 +58,7 @@ public class Point {
 		try {
 			// 创建切面类的对象并添加到切面链中
 			aspects.add(aspectPointClass.newInstance());
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

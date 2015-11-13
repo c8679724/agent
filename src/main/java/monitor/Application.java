@@ -34,6 +34,18 @@ public class Application {
 		Application.packageName.set(packageName);
 		Application.className.set(className);
 	}
+	
+
+	/**
+	 * 设置正在处理的类的包名、类名到当前线程中，以便硬编码这些信息到切面中
+	 * 
+	 * @param className_
+	 */
+	public static void setClass(String packageName,String className_) {
+		Application.packageName.set(packageName);
+		Application.className.set(className_);
+	}
+
 
 	public static final long getMethodRunIndex(long fatherRunIndex) {
 
