@@ -14,7 +14,7 @@ public class TestClassesChoose {
 	public void chooseClasses() {
 		String path = Properties.class.getResource("/").getPath();
 		String propertiesFilePath = path + "test.properties";
-		Properties.doProperties(propertiesFilePath);
+		Properties.doMonitorSystemProperties(propertiesFilePath);
 
 		// Class<?>[] classes = new Class<?>[] {
 		// sun.text.resources.FormatData_zh.class, List.class, Test1.class,

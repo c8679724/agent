@@ -37,8 +37,8 @@ public class Agent {
 		System.out.println("stating agent.........");
 
 		String path = Agent.class.getResource("/").getPath();
-		String propertiesFilePath = path + "test.properties";
-		Properties.doProperties(propertiesFilePath);
+		String propertiesFilePath = path + "monitor.properties";
+		Properties.doMonitorSystemProperties(propertiesFilePath);
 
 		Class[] classes = inst.getAllLoadedClasses();
 //		for (Class class1 : classes) {

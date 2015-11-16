@@ -33,7 +33,41 @@ public class Properties {
 		this.monitorServerURL = monitorServerURL;
 	}
 
-	public static void doProperties(String propertiesFilePath) {
+	public static void doMonitorSystemProperties(String propertiesFilePath) {
+
+		Map<String, String> propertiesMap = new HashMap<String, String>();
+		java.util.Properties pps = new java.util.Properties();
+		try {
+			pps.load(new FileInputStream(propertiesFilePath));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Enumeration<?> enum1 = pps.propertyNames();// 得到配置文件的名字
+		while (enum1.hasMoreElements()) {
+			String strKey = (String) enum1.nextElement();
+			String strValue = pps.getProperty(strKey);
+			propertiesMap.put(strKey, strValue);
+		}
+
+		// monitorPatterns
+		String monitorPatternsString = propertiesMap.get("monitorPatterns");
+		String[] monitorPatternsStrings = monitorPatternsString.split(",");
+		String[] monitorPatterns = new String[monitorPatternsStrings.length];
+		for (int i = 0; i < monitorPatternsStrings.length; i++) {
+			monitorPatterns[i] = propertiesMap.get(monitorPatternsStrings[i]);
+		}
+		Pattern[] patterns = new Pattern[monitorPatterns.length];
+		for (int i = 0; i < patterns.length; i++) {
+			patterns[i] = Pattern.compile(monitorPatterns[i]);
+		}
+		ClassesChoose.setPatterns(patterns);
+
+		// monitorServerURL
+	}
+	
+	public static void doUserProperties(String propertiesFilePath) {
 
 		Map<String, String> propertiesMap = new HashMap<String, String>();
 		java.util.Properties pps = new java.util.Properties();
@@ -69,8 +103,8 @@ public class Properties {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		String path = Properties.class.getResource("/").getPath();
-		String propertiesFilePath = path + "test.properties";
-		doProperties(propertiesFilePath);
+		String propertiesFilePath = path + "monitor.properties";
+		doMonitorSystemProperties(propertiesFilePath);
 
 		Class<?>[] classes = new Class<?>[] { List.class, Test1.class, Test2.class, Properties.class };
 		classes = ClassesChoose.chooseClasses(classes);

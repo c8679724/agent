@@ -50,7 +50,7 @@ public class ClassesChoose {
 		for (int i = 0; i < classes.length; i++) {
 			classIndex = classes[i];
 			String clazzPath = classIndex.getName();
-			// 这个类如果是jdk自带的类
+			// 这个类如果是jdk自带的类，则不需要进行下一步匹配了
 			for (int j = 0; j < jdkPatterns.length; j++) {
 				matcher = jdkPatterns[j].matcher(clazzPath);
 				mr = matcher.matches();
