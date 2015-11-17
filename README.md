@@ -1,0 +1,7 @@
+# agent
+eagleEyeAgent 的agent支持部分，提供premain和agentmain两种入口
+
+这个agent将提供基于JIT的aop功能，用户使用时把jar通过premain或者agentmain的方式在项目中启动，
+就能针对用户想要被监控的方法进行监控了。
+用户也可以把这一部分当成aop来用，不需要依赖除了当前jar的任何jar就能对用户想要添加aop的地方编织用户的代码到方法的第一行
+和返回前的最后一行。 使用字节码重写的技术实现。
