@@ -2,6 +2,7 @@ package monitor.aop;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import monitor.Properties;
@@ -11,9 +12,9 @@ import test.Test2;
 public class TestClassesChoose {
 
 	@Test
+	@Ignore
 	public void chooseClasses() {
-		String path = Properties.class.getResource("/").getPath();
-		String propertiesFilePath = path + "test.properties";
+		String propertiesFilePath = "/monitor.properties";
 		Properties.doMonitorSystemProperties(propertiesFilePath);
 
 		// Class<?>[] classes = new Class<?>[] {

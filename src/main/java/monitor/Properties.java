@@ -17,9 +17,6 @@ public class Properties {
 
 	private static String monitorServerURL;
 
-	// 改成内部配置文件的方式
-	private static final String[] monitorPrivatePatterns = new String[] {};
-
 	public Properties() {
 
 		monitorServerURL = "";
@@ -29,16 +26,12 @@ public class Properties {
 		return monitorServerURL;
 	}
 
-	public void setMonitorServerURL(String monitorServerURL) {
-		this.monitorServerURL = monitorServerURL;
-	}
-
 	public static void doMonitorSystemProperties(String propertiesFilePath) {
 
 		Map<String, String> propertiesMap = new HashMap<String, String>();
 		java.util.Properties pps = new java.util.Properties();
 		try {
-			pps.load(new FileInputStream(propertiesFilePath));
+			pps.load(Properties.class.getResourceAsStream(propertiesFilePath));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -51,28 +44,39 @@ public class Properties {
 			propertiesMap.put(strKey, strValue);
 		}
 
-		// monitorPatterns
-		String monitorPatternsString = propertiesMap.get("monitorPatterns");
-		String[] monitorPatternsStrings = monitorPatternsString.split(",");
-		String[] monitorPatterns = new String[monitorPatternsStrings.length];
-		for (int i = 0; i < monitorPatternsStrings.length; i++) {
-			monitorPatterns[i] = propertiesMap.get(monitorPatternsStrings[i]);
+		// exPatterns
+		String exPatterns_ = propertiesMap.get("exPatterns");
+		String[] exPatternsStrings = exPatterns_.split(",");
+		String[] exPatterns = new String[exPatternsStrings.length];
+		for (int i = 0; i < exPatternsStrings.length; i++) {
+			exPatterns[i] = propertiesMap.get(exPatternsStrings[i]);
 		}
-		Pattern[] patterns = new Pattern[monitorPatterns.length];
+		Pattern[] patterns = new Pattern[exPatterns.length];
 		for (int i = 0; i < patterns.length; i++) {
-			patterns[i] = Pattern.compile(monitorPatterns[i]);
+			patterns[i] = Pattern.compile(exPatterns[i]);
 		}
-		ClassesChoose.setPatterns(patterns);
+		ClassesChoose.setJdkPatterns(patterns);
 
-		// monitorServerURL
+		// inPatterns
+		String inPatterns_ = propertiesMap.get("inPatterns");
+		String[] inPatternsStrings = inPatterns_.split(",");
+		String[] inPatterns = new String[inPatternsStrings.length];
+		for (int i = 0; i < inPatternsStrings.length; i++) {
+			inPatterns[i] = propertiesMap.get(inPatternsStrings[i]);
+		}
+		Pattern[] patterns2 = new Pattern[inPatterns.length];
+		for (int i = 0; i < patterns2.length; i++) {
+			patterns2[i] = Pattern.compile(inPatterns[i]);
+		}
+		ClassesChoose.setInPatterns(patterns2);
 	}
-	
-	public static void doUserProperties(String propertiesFilePath) {
+
+	public static void doUserProperties(String jarFilePath) {
 
 		Map<String, String> propertiesMap = new HashMap<String, String>();
 		java.util.Properties pps = new java.util.Properties();
 		try {
-			pps.load(new FileInputStream(propertiesFilePath));
+			pps.load(new FileInputStream(jarFilePath + "/monitor.properties"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -102,8 +106,7 @@ public class Properties {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		String path = Properties.class.getResource("/").getPath();
-		String propertiesFilePath = path + "monitor.properties";
+		String propertiesFilePath = "/monitor.properties";
 		doMonitorSystemProperties(propertiesFilePath);
 
 		Class<?>[] classes = new Class<?>[] { List.class, Test1.class, Test2.class, Properties.class };

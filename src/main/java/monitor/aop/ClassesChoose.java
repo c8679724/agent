@@ -27,7 +27,7 @@ public class ClassesChoose {
 	/**
 	 * 反向规则正则表达式
 	 */
-	private static Pattern[] exPatterns;
+	private static Pattern[] inPatterns;
 
 	/**
 	 * 
@@ -38,15 +38,8 @@ public class ClassesChoose {
 		List<Class<?>> classes2 = new ArrayList<Class<?>>();
 		boolean r = false;
 		Class<?> classIndex = null;
-		jdkPatterns = new Pattern[6];
 		Matcher matcher = null;
 		boolean mr = false;
-		jdkPatterns[0] = Pattern.compile("javax.*");
-		jdkPatterns[1] = Pattern.compile("com.sun.*");
-		jdkPatterns[2] = Pattern.compile("sun..*");
-		jdkPatterns[3] = Pattern.compile("java.*");
-		jdkPatterns[4] = Pattern.compile("sunw.*");
-		jdkPatterns[5] = Pattern.compile("\\[.*");
 		for (int i = 0; i < classes.length; i++) {
 			classIndex = classes[i];
 			String clazzPath = classIndex.getName();
@@ -182,6 +175,14 @@ public class ClassesChoose {
 
 	public static void setPatterns(Pattern[] patterns) {
 		ClassesChoose.patterns = patterns;
+	}
+	
+	public static void setJdkPatterns(Pattern[] patterns) {
+		ClassesChoose.jdkPatterns = patterns;
+	}
+	
+	public static void setInPatterns(Pattern[] patterns) {
+		ClassesChoose.inPatterns = patterns;
 	}
 
 }

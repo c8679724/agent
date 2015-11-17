@@ -34,16 +34,26 @@ public class Agent {
 	@SuppressWarnings("rawtypes")
 	public static void agent(String args, Instrumentation inst) {
 
+		// 用一个map把转换之前的字节码存储起来，序列化这个map到javatmp中，
+		// 如果发生改动了，十秒后往缓存文件里写一次
+		// 在退出监控的时候把字节码换回去，减少性能消耗，也方便下一次转换
+
+		// 检查是否已经被转换过了，使用类的内存标记类的版本号
+
 		System.out.println("stating agent.........");
 
-		String path = Agent.class.getResource("/").getPath();
-		String propertiesFilePath = path + "monitor.properties";
+		String path = Agent.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		if (path.endsWith(".jar")) {
+			String[] path_splits = path.split("/");
+			path = path.substring(0, path.length() - path_splits[path_splits.length - 1].length());
+		}
+		String propertiesFilePath = "/monitor.properties";
 		Properties.doMonitorSystemProperties(propertiesFilePath);
-
+		Properties.doUserProperties(path);
 		Class[] classes = inst.getAllLoadedClasses();
-//		for (Class class1 : classes) {
-//			System.out.println("------"+class1.getName());
-//		}
+		// for (Class class1 : classes) {
+		// System.out.println("------"+class1.getName());
+		// }
 		Class[] classes2 = ClassesChoose.chooseClasses(classes);
 
 		inst.addTransformer(new Transformer(), true);
